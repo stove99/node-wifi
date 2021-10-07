@@ -1,6 +1,7 @@
 const execFile = require('child_process').execFile;
 const env = require('./env');
 const networkUtils = require('./utils/network-utils.js');
+const iconv = require('iconv-lite');
 
 function parseShowInterfaces(stdout) {
   const lines = stdout.split('\r\n');
@@ -56,12 +57,15 @@ function parseShowInterfaces(stdout) {
 
 function getCurrentConnection(config, callback) {
   const params = ['wlan', 'show', 'interfaces'];
-  execFile('netsh', params, { env }, (err, stdout) => {
+  execFile('netsh', params, { env, encoding: 'binary' }, (err, stdout) => {
     if (err) {
       callback && callback(err);
     } else {
       try {
-        const connections = parseShowInterfaces(stdout, config);
+        const connections = parseShowInterfaces(
+          iconv.decode(stdout, 'euc-kr'),
+          config
+        );
         callback && callback(null, connections);
       } catch (e) {
         callback && callback(e);

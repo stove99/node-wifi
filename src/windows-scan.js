@@ -1,18 +1,23 @@
 const execFile = require('child_process').execFile;
 const networkUtils = require('./utils/network-utils');
 const env = require('./env');
+const iconv = require('iconv-lite');
 
-function scanWifi(config, callback) {
+function scanWifi(_, callback) {
   try {
     execFile(
       'netsh',
       ['wlan', 'show', 'networks', 'mode=Bssid'],
-      { env },
+      { env, encoding: 'binary' },
       (err, scanResults) => {
         if (err) {
           callback && callback(err);
           return;
         }
+
+        scanResults = iconv.decode(scanResults, 'euc-kr');
+
+        console.log('xxx', scanResults);
 
         scanResults = scanResults
           .toString('utf8')

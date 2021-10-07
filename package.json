@@ -36,7 +36,8 @@
   "dependencies": {
     "command-line-args": "^5.2.0",
     "command-line-usage": "^6.1.1",
-    "iconv-lite": "^0.6.3"
+    "iconv-lite": "^0.6.3",
+    "urldecode": "^1.0.1"
   },
   "devDependencies": {
     "dotenv": "^10.0.0",

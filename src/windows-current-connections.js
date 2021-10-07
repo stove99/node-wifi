@@ -2,6 +2,7 @@ const execFile = require('child_process').execFile;
 const env = require('./env');
 const networkUtils = require('./utils/network-utils.js');
 const iconv = require('iconv-lite');
+const decode = require('urldecode');
 
 function parseShowInterfaces(stdout) {
   const lines = stdout.split('\r\n');
@@ -31,6 +32,15 @@ function parseShowInterfaces(stdout) {
     for (let j = 0; j < fields.length; j++) {
       const line = lines[i + j];
       tmpConnection[fields[j]] = line.match(/.*: (.*)/)[1];
+    }
+
+    const isHex = networkUtils.isHex(tmpConnection.ssid);
+    if (isHex) {
+      try {
+        const chunked = networkUtils.chunk(tmpConnection.ssid.split(''), 2);
+        const encoded = '%' + chunked.map(c => c.join('')).join('%');
+        tmpConnection.ssid = decode(encoded);
+      } catch {}
     }
 
     connections.push({

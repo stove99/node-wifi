@@ -49,6 +49,25 @@ function qualityFromDB(db) {
   return 2 * (parseFloat(db) + 100);
 }
 
+const hexReg = /^[0-9a-fA-F]+$/gm;
+function isHex(str) {
+  return hexReg.test(str);
+}
+
+function chunk(array, size) {
+  const chunked = [];
+  let index = 0;
+
+  while (index < array.length) {
+    chunked.push(array.slice(index, index + size));
+    index += size;
+  }
+
+  return chunked;
+}
+
 exports.frequencyFromChannel = frequencyFromChannel;
 exports.dBFromQuality = dBFromQuality;
 exports.qualityFromDB = qualityFromDB;
+exports.isHex = isHex;
+exports.chunk = chunk;

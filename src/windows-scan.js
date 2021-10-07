@@ -2,6 +2,7 @@ const execFile = require('child_process').execFile;
 const networkUtils = require('./utils/network-utils');
 const env = require('./env');
 const iconv = require('iconv-lite');
+const decode = require('urldecode');
 
 function scanWifi(_, callback) {
   try {
@@ -16,8 +17,6 @@ function scanWifi(_, callback) {
         }
 
         scanResults = iconv.decode(scanResults, 'euc-kr');
-
-        console.log('xxx', scanResults);
 
         scanResults = scanResults
           .toString('utf8')
@@ -65,6 +64,17 @@ function parse(networkTmp) {
   network.mac = networkTmp[4] ? networkTmp[4].match(/.*?:\s(.*)/)[1] : '';
   network.bssid = network.mac;
   network.ssid = networkTmp[0] ? networkTmp[0].match(/.*?:\s(.*)/)[1] : '';
+
+  const isHex = networkUtils.isHex(network.ssid);
+
+  if (isHex) {
+    try {
+      const chunked = networkUtils.chunk(network.ssid.split(''), 2);
+      const encoded = '%' + chunked.map(c => c.join('')).join('%');
+      network.ssid = decode(encoded);
+    } catch {}
+  }
+
   network.channel = networkTmp[7]
     ? parseInt(networkTmp[7].match(/.*?:\s(.*)/)[1])
     : -1;
